@@ -1,9 +1,9 @@
-/*                                                                             
- * Enable user-mode ARM performance counter access.                            
- */
 #include <linux/kernel.h>
 #include <linux/module.h>
 #include <linux/smp.h>
+
+#define DRIVER_AUTHOR "iamywang <41533488+iamywang@users.noreply.github.com>"
+#define DRIVER_DESC "Enable reading pmccntr_el0 register from EL0 on raspberry pi 4."
 
 #define PERF_DEF_OPTS (1 | 16)
 #define PERF_OPT_RESET_CYCLES (2 | 4)
@@ -30,6 +30,7 @@ static inline u32 armv8pmu_pmcr_read(void)
                  : "=r"(val));
     return (u32)val;
 }
+
 static inline void armv8pmu_pmcr_write(u32 val)
 {
     val &= ARMV8_PMCR_MASK;
@@ -48,8 +49,7 @@ static inline long long armv8_read_CNTPCT_EL0(void)
     return val;
 }
 
-static void
-enable_cpu_counters(void *data)
+static void enable_cpu_counters(void *data)
 {
     u32 val = 0;
     asm volatile("msr pmuserenr_el0, %0"
@@ -61,8 +61,7 @@ enable_cpu_counters(void *data)
     printk("\nCPU:%d ", smp_processor_id());
 }
 
-static void
-disable_cpu_counters(void *data)
+static void disable_cpu_counters(void *data)
 {
     u32 val = 0;
     printk(KERN_INFO "\ndisabling user-mode PMU access on CPU #%d",
@@ -75,8 +74,7 @@ disable_cpu_counters(void *data)
                  : "r"((u64)0));
 }
 
-static int __init
-init(void)
+static int __init rasp_pi4_pmccntr_init(void)
 {
     u64 cval;
     u32 val;
@@ -97,12 +95,10 @@ init(void)
     return 0;
 }
 
-static void __exit
-fini(void)
+static void __exit rasp_pi4_pmccntr_exit(void)
 {
     on_each_cpu(disable_cpu_counters, NULL, 1);
-    printk(KERN_INFO "Access PMU Disabled");
 }
 
-module_init(init);
-module_exit(fini);
+module_init(rasp_pi4_pmccntr_init);
+module_exit(rasp_pi4_pmccntr_exit);

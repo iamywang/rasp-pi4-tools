@@ -1,18 +1,12 @@
-/*
- * rasp-pi4-prefetch.c -- disable prefetch on raspberry pi 4
- */
-
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
 
 #define DRIVER_AUTHOR "iamywang <41533488+iamywang@users.noreply.github.com>"
-#define DRIVER_DESC "disable prefetch on raspberry pi 4"
-#define getbit(x, y) ((x) >> (y)&1)
+#define DRIVER_DESC "Check load/store hardware prefetcher on raspberry pi 4."
 
 static int __init rasp_pi4_prefetch_disable_init(void)
 {
-
     uint64_t aux = 0;
 
     asm volatile("mrs %0, S3_1_c15_c2_0\n"
