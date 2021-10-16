@@ -1,7 +1,7 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
-
+#define getbit(x, y) ((x) >> (y)&1)
 #define DRIVER_AUTHOR "iamywang <41533488+iamywang@users.noreply.github.com>"
 #define DRIVER_DESC "Check load/store hardware prefetcher on raspberry pi 4."
 
